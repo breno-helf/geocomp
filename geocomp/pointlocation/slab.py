@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Algoritmo de Graham"""
+"""Algoritmo de Slab Decomposition para localização de ponto"""
 
 from geocomp.common.polygon import Polygon
 from geocomp.common import control
@@ -7,9 +7,8 @@ from geocomp.common.guiprim import *
 from functools import cmp_to_key
 
 
-def Graham (l):
-    "Algoritmo de Graham para achar o fecho convexo de uma lista l de pontos"
-
+def SlabDecomposition (l):
+    "Slab decomposition algorithm"
     if len (l) == 0: return None
 
     # So um ponto foi passado. Retorna um fecho c/ apenas um ponto
