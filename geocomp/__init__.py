@@ -5,6 +5,7 @@
 Sub-modulos:
 - convexhull: algoritmos para o problema do Fecho Convexo bidimensional
 - farthest:   algoritmos para encontrar o par de pontos mais distante
+- pointlocation: algoritmos para localizar ponto dentro do poligono
 
 - common:     classes e operacoes usadas por diversos algoritmos
 - gui:        implementacoes das operacoes graficas

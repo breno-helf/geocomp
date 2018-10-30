@@ -7,9 +7,9 @@ from . import slab
 
 # cada entrada deve ter:
 #  [ 'nome-do-modulo', 'nome-da-funcao', 'nome do algoritmo' ]
-children = ( 
-    ( 'slab', 'SlabDecomposition', 'Slab Decomposition' )
-)
+children = [ 
+    ( 'slab', 'SlabDecomposition', 'Slab Decomposition' ) 
+]
 
 #children = algorithms
 
