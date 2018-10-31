@@ -11,7 +11,7 @@ fecho convexo planar:
 - Algoritmo ótimo propost por Bhattacharya e Sen[2]
 
 Existem três "front-ends" ({cli,tk,g}geocomp.py). Para rodar qualquer
-um deles, você vai precisar de Python (testado com aa versão 3.5.4,
+um deles, você vai precisar de Python (testado com a versão 3.5.4,
 mas 3.x.x deve funcionar).  Além disso, tkgeocomp.py precisa do módulo
 padrão de Tk que acompanha a distribuição de Python. O módulo
 ggeocomp.py atualmente não está funcionando, pois o pacote que esse
@@ -48,14 +48,14 @@ continuam sendo desenhados na mesma proporção.
 
 O front-end cligeocomp.py pode ser usado para rodar os algoritmos não
 interativamente. Ele pode ser chamado como:
-	cligeocomp geocomp/convexhull/graham.py dados/ptos*
+    cligeocomp geocomp/convexhull/graham.py dados/ptos*
 para rodar o algoritmo de Graham em todos os arquivos dados/ptos*, ou
 como
-	cligeocomp -a dados/ptos2.pts geocomp/convexhull/graham.py \
-			geocomp/convexhull/quickhull.py
+    cligeocomp -a dados/ptos2.pts geocomp/convexhull/graham.py \
+            geocomp/convexhull/quickhull.py
 para rodar os algortimos de Graham e Quickhull dando dados/ptos2.pts de
 entrada. (dica: para rodar todos os algoritmos de fecho convexo, use
-	cligeocomp -a dados/ptos2.pts geocomp.convexhull/[^_]*.py
+    cligeocomp -a dados/ptos2.pts geocomp.convexhull/[^_]*.py
   [^_]*.py vai pegar todos os arquivo que acabam em ".py" e que não
 começam com "_")
 
@@ -66,7 +66,7 @@ Para acrescentar um novo algoritmo de, por exemplo, fecho convexo:
 - escreva seu algoritmo no arquivo geocomp/convexhull/novo_alg.py, numa
   função Novo_alg
 - edite geocomp/convexhull/__init__.py colocando uma linha
-	import novo_alg
+    import novo_alg
   e adicione um item 
   ('novo_alg', 'Novo_alg', 'um nome para aparecer na interface grafica')
   à variável children
@@ -80,7 +80,7 @@ Para colocar um novo problema:
   ( 'foo', 'Funcao_de_Foo', 'Nome para a interface grafica')
     para cada arquivo foo.py em geocomp/convexhull/
 - edite geocomp/__init__.py e coloque uma linha:
-	import novo_problema
+    import novo_problema
   e coloque um item
   ( 'novo_problema', None, 'Um nome para a interface grafica')
   na variável children
