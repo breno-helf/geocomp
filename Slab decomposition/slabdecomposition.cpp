@@ -33,7 +33,7 @@ double calcY(pair<double, double> begLine, pair<double, double> endLine, double 
 
 int bsRec(vector<pair<double, double> >& slabs, pair<double, double> p, int beg, int end) {
     int mid = (beg + end)/2;
-    if (slabs[mid].first <= p.first && slabs[mid].second >= p.first) {
+    if (slabs[mid].first <= p.first && slabs[mid].second > p.first) {
         return mid;
     }
     else if (slabs[mid].first > p.first) {
@@ -79,7 +79,15 @@ void make_lines(vector<vector<tuple<double, double, int> > >& lines, vector<pair
     }
     for (int i = 0; i < slabs.size(); i++) {
         lines[i].push_back({DMAX, DMAX, -1});
-        sort(lines[i].begin(), lines[i].end());
+        sort(lines[i].begin(), lines[i].end(), [](auto lhs, auto rhs) {
+            if (get<0>(lhs) < get<0>(rhs)) return true;
+            if (get<0>(lhs) > get<0>(rhs)) return false;
+            if (get<1>(lhs) < get<1>(rhs)) return true;
+            if (get<1>(lhs) > get<1>(rhs)) return false;
+            if (get<2>(lhs) > get<2>(rhs)) return true;
+            if (get<2>(lhs) < get<2>(rhs)) return false;
+            return false;
+        });
         lines[i].erase(unique(lines[i].begin(), lines[i].end()), lines[i].end());
     }
 }
