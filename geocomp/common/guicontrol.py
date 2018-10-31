@@ -7,8 +7,7 @@ gui = None
 
 import time
 from . import prim
-from . import control
-
+from . import control 
 
 def init_display (toolkit, master):
     "Inicializa o toolkit (Tk, GNOME,...) especificado"
@@ -84,12 +83,71 @@ def config_canvas (pontos):
     # para "garantir" que os updates nao estao congelados
     control.thaw_update (10000000)
 
+
+def config_canvas_polygons (pontos):
+    """Configura o canvas para mostrar os pontos passados."""
+    
+    if len (pontos) == 0: 
+        return
+
+    minx = pontos[0].x
+    miny = pontos[0].y
+    maxx = pontos[0].x
+    maxy = pontos[0].y
+
+    for i in pontos[1:]:
+        if i.x < minx:
+            minx = i.x
+        if i.y < miny:
+            miny = i.y
+        if i.x > maxx:
+            maxx = i.x
+        if i.y > maxy:
+            maxy = i.y
+    
+    if minx == maxx:
+        if minx == 0:
+            minx = -1
+            maxx = 1
+        else:
+            minx = int (0.9 * minx)
+            maxx = int (1.1 * maxx)
+    
+    if miny == maxy:
+        if miny == 0:
+            miny = -1
+            maxy = 1
+        else:
+            miny = int (0.9 * minx)
+            maxx = int (1.1 * maxx)
+
+
+    control.freeze_update ()
+    gui.config_canvas (minx, maxx, miny, maxy)
+
+    N = int(pontos[0].x)
+    i = 1
+    for j in range(N):
+        P = int(pontos[i].x)
+        i += 1
+        for k in range(P):
+            pontos[i + k].plot()
+            pontos[i + k].lineto(pontos[i + (k + 1) % P])
+        i += P
+    # para "garantir" que os updates nao estao congelados
+    control.thaw_update (10000000)
+
+
 def run_algorithm (alg, input):
     """roda o algoritmo alg, usando input como entrada
     
     Retorna uma lista contendo o total de operacoes primitivas executadas 
     e uma string opcionalmente retornada pelo algoritmo"""
-    config_canvas (input)
+
+    if (alg.__name__ == 'SlabDecomposition'):
+        config_canvas_polygons(input)
+    else:
+        config_canvas (input)
 
     show = 1
     if gui.hide_algorithm ():
