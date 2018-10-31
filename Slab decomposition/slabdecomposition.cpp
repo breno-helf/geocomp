@@ -113,22 +113,22 @@ int bsPointLines(vector<tuple<double, double, int> >& lines, pair<double, double
 int main() {
 	
 	/*
-	Input: first line: N (number of polygons)
-	for each polygon:  first line: P (number of points)
+	Input: first line: N 0 (number of polygons)
+	for each polygon:  first line: P 0 (number of points)
 	                   next P lines: X Y (coordinates for each point)
-	                   M (number of teste points)
+	                   M 0 (number of teste points)
 	next M lines:      X Y (coordinates for each point)
 	
 	Out put: for each point, one number [-1, N], the number of the
 	polygon it's in or -1 if its not inside any one
 	*/
 	
-	int N, sz;
-	cin >> N;
+	int N, sz, ign;
+	cin >> N >> ign;
 	vector<vector<pair<double, double> > > polygons(N);
 	set<double> xcoords;
 	for (int i = 0; i < N; i++) {
-	    cin >> sz;
+	    cin >> sz >> ign;
 	    polygons[i].resize(sz);
 	    for (int j = 0; j < sz; j++) {
 	        cin >> polygons[i][j].first >> polygons[i][j].second;
@@ -144,7 +144,7 @@ int main() {
 	
 	int numP;
 	int s, l;
-	cin >> numP;
+	cin >> numP >> ign;
 	vector<pair<double, double> > points(numP);
 	for (int i = 0; i < numP; i++) {
 	    cin >> points[i].first >> points[i].second;
