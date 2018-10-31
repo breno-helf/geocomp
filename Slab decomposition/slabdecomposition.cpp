@@ -5,6 +5,11 @@ double DMIN = -100;
 double DMAX = 100;
 
 void make_slabs(vector<pair<double, double> >& slabs, set<double>& xcoords) {
+    
+    /*
+    creats a new slab for each point in set xcoords
+    */
+    
     double lhs, rhs = DMIN;
     for (auto it = xcoords.begin(); it != xcoords.end(); it++) {
         lhs = rhs;
@@ -15,6 +20,11 @@ void make_slabs(vector<pair<double, double> >& slabs, set<double>& xcoords) {
 }
 
 double calcY(pair<double, double> begLine, pair<double, double> endLine, double X) {
+    
+    /*
+    returns the coord Y corresponding to X in the line given by points begLine and endLine
+    */
+    
     double Y = (X - begLine.first) * (endLine.second - begLine.second);
     Y /= (endLine.first - begLine.first);
     Y += begLine.second;
@@ -33,6 +43,11 @@ int bsRec(vector<pair<double, double> >& slabs, pair<double, double> p, int beg,
 }
 
 int bs(vector<pair<double, double> >& slabs, pair<double, double> p) {
+    
+    /*
+    returns the index of the slab that contains point p
+    */
+    
     return bsRec(slabs, p, 0, slabs.size());
 }
 void add_line(vector<vector<tuple<double, double, int> > >& lines, vector<pair<double, double> >& slabs, pair<double, double> beg, pair<double, double> end, int pNum) {
@@ -52,6 +67,11 @@ void add_line(vector<vector<tuple<double, double, int> > >& lines, vector<pair<d
 }
 
 void make_lines(vector<vector<tuple<double, double, int> > >& lines, vector<pair<double, double> >& slabs, vector<vector<pair<double, double> > >& polygons) {
+    
+    /*
+    traverses all polygons and for each edge, adds it to the correspoding lines
+    */
+    
     for (int i = 0; i < polygons.size(); i++) {
         for (int j = 0; j < polygons[i].size(); j++) {
             add_line(lines, slabs, polygons[i][j], polygons[i][(j + 1) % polygons[i].size()], i);
@@ -65,10 +85,20 @@ void make_lines(vector<vector<tuple<double, double, int> > >& lines, vector<pair
 }
 
 bool esquerda(double X1, double Y1, double X2, double Y2, double X3, double Y3) {
+    
+    /*
+    returns if point (X3, Y3) is to the left of the line formed by (X1, Y1) and (X2, Y2)
+    */
+    
     return ((X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1) >= 0);
 }
 
 int bsPointLines(vector<tuple<double, double, int> >& lines, pair<double, double> slab, pair<double, double> p, int beg, int end) {
+    
+    /*
+    binary seach, returns the index of the first line in vector lines that is above point p
+    */
+    
     int mid = (beg + 1 + end)/2;
     if (mid == 0) return mid;
     if (esquerda(slab.first, get<0>(lines[mid]), slab.second, get<1>(lines[mid]), p.first, p.second)) {
@@ -88,6 +118,9 @@ int main() {
 	                   next P lines: X Y (coordinates for each point)
 	                   M (number of teste points)
 	next M lines:      X Y (coordinates for each point)
+	
+	Out put: for each point, one number [-1, N], the number of the
+	polygon it's in or -1 if its not inside any one
 	*/
 	
 	int N, sz;
