@@ -8,16 +8,12 @@ def esquerda(X1, Y1, X2, Y2, X3, Y3):
     return ((X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1) >= 0)
 
 class Event(object):
-    beg = [0.0, 0.0]
-    end = [0.0, 0.0]
     insert = True
     polygon = -2
     
     def __init__(self, beg, end, ins, p):
-        self.beg[0] = beg[0]
-        self.beg[1] = beg[1]
-        self.end[0] = end[0]
-        self.end[1] = end[1]
+        self.beg = (beg[0], beg[1])
+        self.end = (end[0], end[1])
         self.insert = ins
         self.polygon = p
 
@@ -84,7 +80,8 @@ def print_HorLine(hl):
 # AVL code, based on the geeks for geeks version:
 # https://www.geeksforgeeks.org/avl-tree-set-2-deletion/ 
 
-class TreeNode(object): 
+class TreeNode(object):
+    
     def __init__(self, key, val):
         self.key = key
         self.val = val 
@@ -290,11 +287,6 @@ class AVL_Tree(object):
 def make_events(polygons):
     evts = AVL_Tree()
     root = None
-    lp = [0.0, 0.0]
-    rp = [0.0, 0.0]
-    
-    lb = []
-    
     for i in range (len(polygons)):
         for j in range (len(polygons[i])):
             lp = []
@@ -306,30 +298,19 @@ def make_events(polygons):
                 rp.append(polygons[i][(j + 1) % len(polygons[i])][1])
                 poly = i
             else:
-                lp.append(polygons[i][j][0])
-                lp.append(polygons[i][j][1])
-                rp.append(polygons[i][(j + 1) % len(polygons[i])][0])
-                rp.append(polygons[i][(j + 1) % len(polygons[i])][1])
+                rp.append(polygons[i][j][0])
+                rp.append(polygons[i][j][1])
+                lp.append(polygons[i][(j + 1) % len(polygons[i])][0])
+                lp.append(polygons[i][(j + 1) % len(polygons[i])][1])
                 poly = -1
-            b = Event(lp, rp, True, poly)
-            e = Event(lp, rp, False, poly)
-            b.beg[0] = e.beg[0] = lp[0]
-            b.beg[1] = e.beg[1] = lp[1]
-            b.end[0] = e.end[0] = rp[0]
-            b.end[1] = e.end[1] = rp[1]
-            b.insert = True
-            e.insert = False
-            b.polygon = e.polygon = poly
             if (evts.find(root, lp[0]) == False):
                 root = evts.insert(root, lp[0], [])
-            
-            #(evts.find(root, lp[0])).append(b)
             (evts.find(root, lp[0])).append(Event(lp, rp, True, poly))
             if (evts.find(root, rp[0]) == False):
                 root = evts.insert(root, rp[0], [])
-            #(evts.find(root, rp[0])).append(e)
-            (evts.find(root, lp[0])).append(Event(lp, rp, False, poly))
+            (evts.find(root, rp[0])).append(Event(lp, rp, False, poly))
             
+    
     return root
 
 def print_event(evt):
@@ -365,9 +346,11 @@ def print_slab(s):
     return
 
 def make_slab(slab, abb, root):
-    curr = deepcopy(slab)
-    v = []
-    abb.inOrder(root, v)
+    curr = Slab()
+    curr.beg = slab.beg
+    curr.end = slab.end
+    curr.lines = slab.lines[:]
+    v = abb.inOrder(root)
     for i in range (len(v)):
         curr.lines.append(v[i][0])
     return curr
@@ -399,9 +382,9 @@ def make_slabs(s, events, root):
         for j in range (len(v[i][1])):
             if v[i][1][j].insert:
                 abb_Root = update_abb(abb, abb_Root, v[i][1][j])
-        curr.beg = curr.end
-        curr.end = DMAX
-        s.append(make_slab(curr, abb, abb_Root))
+    curr.beg = curr.end
+    curr.end = DMAX
+    s.append(make_slab(curr, abb, abb_Root))
     
 def bs(s, p):
     beg = 0
@@ -448,9 +431,9 @@ def main():
     events = AVL_Tree()
     eventsRoot = make_events(polygons)
     
-    v = events.inOrder(eventsRoot)
-    for i in range(len(v)):
-        print_event(v[i])
+    #v = events.inOrder(eventsRoot)
+    #for i in range(len(v)):
+    #    print_event(v[i])
     
     s = []
     make_slabs(s, events, eventsRoot)
