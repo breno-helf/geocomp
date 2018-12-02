@@ -297,24 +297,24 @@ class AVL_Tree(object):
         self.printPreOrder(root.left) 
         self.printPreOrder(root.right) 
 
-def make_events(polygons):
+def make_events(point_list):
     evts = AVL_Tree()
     root = None
-    for i in range (len(polygons)):
-        for j in range (len(polygons[i])):
+    for i in range (len(point_list)):
+        for j in range (len(point_list[i])):
             lp = []
             rp = []
-            if (polygons[i][j][0] < polygons[i][(j + 1) % len(polygons[i])][0]):
-                lp.append(polygons[i][j][0])
-                lp.append(polygons[i][j][1])
-                rp.append(polygons[i][(j + 1) % len(polygons[i])][0])
-                rp.append(polygons[i][(j + 1) % len(polygons[i])][1])
+            if (point_list[i][j].x < point_list[i][(j + 1) % len(point_list[i])].x):
+                lp.append(point_list[i][j].x)
+                lp.append(point_list[i][j].y)
+                rp.append(point_list[i][(j + 1) % len(point_list[i])].x)
+                rp.append(point_list[i][(j + 1) % len(point_list[i])].y)
                 poly = i
             else:
-                rp.append(polygons[i][j][0])
-                rp.append(polygons[i][j][1])
-                lp.append(polygons[i][(j + 1) % len(polygons[i])][0])
-                lp.append(polygons[i][(j + 1) % len(polygons[i])][1])
+                rp.append(point_list[i][j].x)
+                rp.append(point_list[i][j].y)
+                lp.append(point_list[i][(j + 1) % len(point_list[i])].x)
+                lp.append(point_list[i][(j + 1) % len(point_list[i])].y)
                 poly = -1
             if (evts.find(root, lp[0]) == False):
                 root = evts.insert(root, lp[0], [])
@@ -468,20 +468,22 @@ def SlabDecomposition (l):
     "Slab decomposition algorithm"
 
     N = int(l[0].x)
+    point_list = []
     polygons = []
     i = 1
     for j in range(N):
         P = int(l[i].x)
         i += 1
-        polygons.append([])
+        point_list.append([])
         for k in range(P):
             a = l[i + k].x
             b = l[i + k].y
-            polygons[j].append((a, b))
+            point_list[j].append(Point(a, b))
+        polygons.append(Polygon(point_list[j]))
         i += P
     
     events = AVL_Tree()
-    eventsRoot = make_events(polygons)
+    eventsRoot = make_events(point_list)
     
     #v = events.inOrder(eventsRoot)
     #for i in range(len(v)):
@@ -509,7 +511,11 @@ def SlabDecomposition (l):
 
     position = []
     for j in range (numP):
-        position.append(bs(s, points[j]))
-
+        poly_id = bs(s, points[j])
+        position.append(poly_id)
+        if (poly_id != -1):
+            polygons[poly_id].plot(config.COLOR_ALT3)
+            control.sleep(.5)
+            polygons[poly_id].hide()
     return position
 
