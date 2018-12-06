@@ -5,6 +5,7 @@ from geocomp.common.polygon import Polygon
 from geocomp.common.point import Point
 from geocomp.common import control
 from geocomp.common.guiprim import *
+from geocomp.common import prim
 from functools import cmp_to_key
 
 from copy import deepcopy
@@ -19,6 +20,14 @@ def esquerda(X1, Y1, X2, Y2, X3, Y3):
     C = Point(X3, Y3)
     return left_on(A, B, C)
     #return ((X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1) >= 0)
+
+def esquerda2(X1, Y1, X2, Y2, X3, Y3):
+    A = Point(X1, Y1)
+    B = Point(X2, Y2)
+    C = Point(X3, Y3)
+    return prim.left_on(A, B, C)
+    #return ((X2 - X1) * (Y3 - Y1) - (X3 - X1) * (Y2 - Y1) >= 0)
+
 
 class Event(object):
     insert = True
@@ -55,14 +64,19 @@ class HorLine(object):
         if (self.beg[0] == other.beg[0] and self.beg[1] == other.beg[1]):
             if (self.end[0] == other.end[0] and self.end[1] == other.end[1]):
                 return (self.polygon > other.polygon)
-        b1 = esquerda(other.beg[0], other.beg[1], other.end[0], other.end[1], self.beg[0], self.beg[1])
-        b2 = esquerda(other.beg[0], other.beg[1], other.end[0], other.end[1], self.end[0], self.end[1])
+        line1 = control.plot_segment(self.beg[0], self.beg[1], self.end[0], self.end[1], config.COLOR_ALT3)
+        line2 = control.plot_segment(other.beg[0], other.beg[1], other.end[0], other.end[1], config.COLOR_ALT3)
+        control.sleep()
+        control.plot_delete(line1)
+        control.plot_delete(line2)
+        b1 = esquerda2(other.beg[0], other.beg[1], other.end[0], other.end[1], self.beg[0], self.beg[1])
+        b2 = esquerda2(other.beg[0], other.beg[1], other.end[0], other.end[1], self.end[0], self.end[1])
         if (b1 and b2):
             return False
         if (not b1 and not b2):
             return True
-        b1 = esquerda(self.beg[0], self.beg[1], self.end[0], self.end[1], other.beg[0], other.beg[1])
-        b2 = esquerda(self.beg[0], self.beg[1], self.end[0], self.end[1], other.end[0], other.end[1])
+        b1 = esquerda2(self.beg[0], self.beg[1], self.end[0], self.end[1], other.beg[0], other.beg[1])
+        b2 = esquerda2(self.beg[0], self.beg[1], self.end[0], self.end[1], other.end[0], other.end[1])
         if (b1 and b2):
             return True
         return False
