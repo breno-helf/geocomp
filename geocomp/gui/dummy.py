@@ -2,34 +2,34 @@
 """Implementacao "dummy" das operacoes graficas"""
 
 def init_display (app):
-    pass
+	pass
 
 def get_canvas ():
-    pass
+	pass
 
 def update ():
-    pass
+	pass
 
 def sleep ():
-    pass
+	pass
 
 def plot_disc (x, y, color, r):
-    pass
+	pass
 
-def plot_line (x0, y0, x1, y1, color, linewidth):
-    pass
+def plot_segment (x0, y0, x1, y1, color, linewidth):
+	pass
 
 def plot_vert_line (x, color, linewidth):
-    pass
+	pass
 
 def plot_horiz_line (y, color, linewidth):
-    pass
+	pass
 
 def plot_delete (widget):
-    pass
+	pass
 
 def config_canvas (minx, maxx, miny, maxy):
-    pass
+	pass
 
 def hide_algorithm ():
-    return 1
+	return 1

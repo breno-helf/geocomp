@@ -391,6 +391,7 @@ def make_slabs(s, events, root):
         curr.beg = curr.end
         curr.end = v[i][0]
         s.append(make_slab(curr, abb, abb_Root))
+        lineID = control.plot_vert_line(curr.end)
         for j in range (len(v[i][1])):
             if not v[i][1][j].insert:
                 abb_Root = update_abb(abb, abb_Root, v[i][1][j])
@@ -437,7 +438,7 @@ def bs(s, p):
     while beg < end:
         mid2 = (beg + end) // 2
 
-        lid = control.plot_line(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
+        lid = control.plot_segment(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
         control.sleep(.25)
         
         if esquerda(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], p[0], p[1]):
@@ -447,7 +448,7 @@ def bs(s, p):
 
         control.plot_delete(lid)
 
-    lid = control.plot_line(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
+    lid = control.plot_segment(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
     
     mid2 = beg
 
@@ -467,20 +468,24 @@ def bs(s, p):
 def SlabDecomposition (l):
     "Slab decomposition algorithm"
 
-    N = int(l[0].x)
-    point_list = []
-    polygons = []
-    i = 1
-    for j in range(N):
-        P = int(l[i].x)
-        i += 1
-        point_list.append([])
-        for k in range(P):
-            a = l[i + k].x
-            b = l[i + k].y
-            point_list[j].append(Point(a, b))
-        polygons.append(Polygon(point_list[j]))
-        i += P
+    
+    #N = int(l[0].x)
+    
+    polygons = [poly for poly in l if type(poly) is Polygon]
+    point_list = [poly.vertices() for poly in polygons]
+    N = len(polygons)
+    
+    # i = 1
+    # for j in range(N):
+    #     P = int(l[i].x)
+    #     i += 1
+    #     point_list.append([])
+    #     for k in range(P):
+    #         a = l[i + k].x
+    #         b = l[i + k].y
+    #         point_list[j].append(Point(a, b))
+    #     polygons.append(Polygon(point_list[j]))
+    #     i += P
     
     events = AVL_Tree()
     eventsRoot = make_events(point_list)
@@ -500,14 +505,14 @@ def SlabDecomposition (l):
             s[j].begid = s[j].endid
     s[len(s) - 1].endid = s[len(s) - 1].begid = s[len(s) - 2].endid
 
-    numP = int(l[i].x)
-    points = []
-    i += 1
-    for j in range (numP):
-        a = l[i].x
-        b = l[i].y
-        points.append((a, b))
-        i += 1
+    points = [p for p in l if type(p) is Point]
+    numP = len(points)
+    # i += 1
+    # for j in range (numP):
+    #     a = l[i].x
+    #     b = l[i].y
+    #     points.append((a, b))
+    #     i += 1
 
     position = []
     for j in range (numP):
@@ -517,5 +522,7 @@ def SlabDecomposition (l):
             polygons[poly_id].plot(config.COLOR_ALT3)
             control.sleep(.5)
             polygons[poly_id].hide()
+
+    
     return position
 

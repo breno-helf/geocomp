@@ -28,14 +28,14 @@ from . import bhatta_sen
 # cada entrada deve ter:
 #  [ 'nome-do-modulo', 'nome-da-funcao', 'nome do algoritmo' ]
 children = ( 
-    ( 'graham', 'Graham', 'Graham' ),
-    ( 'gift', 'Gift', 'Embrulho\nPara Presente' ),
-    ( 'quickhull', 'Quickhull', 'Quickhull' ),
-    ( 'incremental', 'Incremental', 'Incremental' ),
-    ( 'incr_prob', 'IncrProb', 'Incremental\nProbabilistico' ),
-    ( 'mergehull', 'Mergehull', 'Mergehull' ),
-    ( 'chan', 'Chan', 'Chan' ),
-    ( 'bhatta_sen', 'Bhatta_Sen', 'Bhattacharya\nSen')
+	( 'graham', 'Graham', 'Graham' ),
+	( 'gift', 'Gift', 'Embrulho\nPara Presente' ),
+	( 'quickhull', 'Quickhull', 'Quickhull' ),
+	( 'incremental', 'Incremental', 'Incremental' ),
+	( 'incr_prob', 'IncrProb', 'Incremental\nProbabilistico' ),
+	( 'mergehull', 'Mergehull', 'Mergehull' ),
+	( 'chan', 'Chan', 'Chan' ),
+	( 'bhatta_sen', 'Bhatta_Sen', 'Bhattacharya\nSen')
 
 )
 

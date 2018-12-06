@@ -4,12 +4,17 @@ from tkinter import *
 import geocomp
 from geocomp.gui import tk
 from geocomp import config
+import geocomp.common.io as io
 import os
 import string
+
+import geocomp.common.control as control
+
 
 class App:
     def __init__ (self):
         "cria a janela e inicializa tudo"
+        control.set_skip(0)
         self.panel = {}
         self.labels = []
         self.file_cont = 0
@@ -33,7 +38,7 @@ class App:
         self.file_label.pack ()
         self.file_sub_frame = Frame (self.file_frame)
         self.file_sub_frame.pack (fill = BOTH)
-        self.selected_file.trace_variable ("w", 
+        self.selected_file.trace_variable ("w",
                                    lambda x, y, z, self=self: self.open_file ())
 
         filename = self.update_files (config.DATADIR)
@@ -42,13 +47,13 @@ class App:
 
         self.main_frame = Frame (self.tk)
         self.main_frame.pack (fill=BOTH, expand = 1)
-        self.main_frame.bind ('<Control-q>', 
+        self.main_frame.bind ('<Control-q>',
                       lambda event, self=self: self.tk.quit ())
 
-        self.canvas = Canvas (self.main_frame, 
-                      width = config.WIDTH, 
-                      height = config.HEIGHT, 
-                      bg = 'black', 
+        self.canvas = Canvas (self.main_frame,
+                      width = config.WIDTH,
+                      height = config.HEIGHT,
+                      bg = 'black',
                       takefocus=1)
         self.canvas.pack (fill = BOTH, expand=1)
 
@@ -57,32 +62,32 @@ class App:
         self.controls.pack (fill = BOTH, expand = 1)
 
         self.step_by_step = IntVar ()
-        self.step_button = Checkbutton (self.controls, 
-                        text = 'passo a passo', 
+        self.step_button = Checkbutton (self.controls,
+                        text = 'passo a passo',
                         variable = self.step_by_step)
 
         self.step_button.grid (row=0, column=0, sticky=W+E, padx=20)
 
-        self.print_canvas = Button (self.controls, 
-                        text = 'imprimir', 
+        self.print_canvas = Button (self.controls,
+                        text = 'imprimir',
                         command = self.print_to_file)
         self.print_canvas.grid (row=0, column = 1, sticky=W+E, padx=20)
 
         self.show_var = IntVar ()
-        self.show_button = Checkbutton (self.controls, 
+        self.show_button = Checkbutton (self.controls,
                         text = 'esconder',
                         variable = self.show_var)
         self.show_button.grid (row=0, column = 2, sticky=W+E, padx=20)
 
 
-        self.delay = Scale (self.main_frame, orient = HORIZONTAL, 
-                    from_ = 0, to = config.MAX_DELAY, 
+        self.delay = Scale (self.main_frame, orient = HORIZONTAL,
+                    from_ = 0, to = config.MAX_DELAY,
                     resolution = 10)
         self.delay.set (config.DELAY)
         self.delay.pack (fill = X, side=BOTTOM)
 
         geocomp.init_display (tk, self)
-        self.points = []
+        self.input = []
         self.step = IntVar ()
         self.step.set (1)
         self.selected_file.set (filename)
@@ -152,7 +157,7 @@ class App:
                                     self.create_buttons (b)
                 b.problem = getattr (problem, a[0])
                 b.parent = problem
-                b.grid (row = row, column = 0, 
+                b.grid (row = row, column = 0,
                     columnspan = 2, sticky = W+E)
             else:
                 alg = getattr (problem, a[0])
@@ -168,7 +173,7 @@ class App:
                 b.label = l
 
             row = row + 1
-            if first: 
+            if first:
                 b.focus_set ()
                 first = 0
                 buttons.focus = b
@@ -178,7 +183,7 @@ class App:
             b['command'] = lambda b=b, self=self: self.create_buttons (b)
             b.problem = parent
             b.parent = parent
-            b.grid (row = row, column = 0, columnspan = 1, 
+            b.grid (row = row, column = 0, columnspan = 1,
                 sticky = W+E)
         else:
             b = Button (buttons, text = 'Sair')
@@ -194,22 +199,23 @@ class App:
     def open_file (self, event=None):
         "abre um arquivo de entrada"
         #if self.in_algorithm: return
-        selection = os.path.join (self.filelist.directory, 
-                      self.selected_file.get ())
-        if os.path.isdir (selection):
-            self.update_files (selection)
+        selection = os.path.join(
+            self.filelist.directory,
+            self.selected_file.get()
+        )
+        if os.path.isdir(selection):
+            self.update_files(selection)
             return
-        else:
-            self.points = geocomp.open_file (selection)
-            self.current_filename = self.selected_file.get ()
-            geocomp.config_canvas (self.points)
-            self.reset_labels ()
-            self.current_algorithm = None
+        self.input = io.read(selection)
+        geocomp.plot_input(self.input)
+        self.current_filename = self.selected_file.get()
+        self.reset_labels()
+        self.current_algorithm = None
 
     def set_entry (self, var, y, mode):
         """um item foi selecionado -> atualiza a entry"""
         self.file_entry.delete (0, END)
-        self.file_entry.insert (END, self.selected_file.get ())
+        self.file_entry.put (END, self.selected_file.get ())
 
     def disable (self):
         """desativa maior parte dos botoes
@@ -220,13 +226,12 @@ class App:
         self.filelist['state'] = DISABLED
         self.filelist['takefocus'] = 0
         for b in list(self.buttons.children.values()):
-             b['state'] = DISABLED
+            b['state'] = DISABLED
         if self.show_var.get ():
             self.delay['state'] = DISABLED
             self.step_button['state'] = DISABLED
             self.print_canvas['state'] = DISABLED
         self.show_button['state'] = DISABLED
-
 
     def enable (self):
         """reativa maior parte dos botoes"""
@@ -235,20 +240,20 @@ class App:
         self.filelist['state'] = NORMAL
         self.filelist['takefocus'] = 1
         for b in list(self.buttons.children.values ()) :
-             b['state'] = NORMAL
+            b['state'] = NORMAL
         if self.show_var.get ():
             self.delay['state'] = NORMAL
             self.step_button['state'] = NORMAL
             self.print_canvas['state'] = NORMAL
         self.show_button['state'] = NORMAL
-                    
+
     def reset_labels (self):
         "Joga fora o conteudo de todos os labels"
         for l in self.labels:
             l['text'] = '------'
 
         self.bottom_label['text'] = '----------'
-            
+
     def print_to_file (self):
         "Imprime self.canvas para um arquivo .eps"
         if self.current_algorithm != None:
@@ -258,32 +263,31 @@ class App:
         else:
             epsfile = self.current_filename + '-' + \
                   repr(self.file_cont) + '.eps'
-            self.canvas.postscript (file=epsfile)
-            self.file_cont = self.file_cont + 1
-                
-    
+        self.canvas.postscript (file=epsfile)
+        self.file_cont = self.file_cont + 1
+
     def run_algorithm (self, alg, widget, alg_name):
         """roda o algoritmo alg"""
         self.file_cont = 0
         self.current_algorithm = alg_name
 
-        if len (self.points) == 0:
+        if len(self.input) == 0:
             return
 
         self.bottom_label['text'] = '----------'
-        self.disable ()
+        self.disable()
         self.canvas.focus_set ()
-        self.tk.bind ('<space>', self.step_cb)
+        self.tk.bind('<space>', self.step_cb)
 
-        cont, extra = geocomp.run_algorithm (alg, self.points)
+        cont, extra = geocomp.run_algorithm (alg, self.input)
 
-        widget.label['text'] = "%6d"%cont
+        widget.label['text'] = "%6d" % cont
         if extra is not None:
             self.bottom_label['text'] = extra
 
-        self.tk.unbind ('<space>')
-        self.enable ()
-        
+        self.tk.unbind('<space>')
+        self.enable()
+
 
 app = App ()
 

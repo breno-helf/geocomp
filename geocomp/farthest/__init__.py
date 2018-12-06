@@ -12,8 +12,8 @@ from . import diameter
 from . import brute
 
 children = [
-    [ 'diameter', 'Diameter', 'Diametro' ],
-    [ 'brute', 'Brute', 'Forca Bruta' ]
+	[ 'diameter', 'Diameter', 'Diametro' ],
+	[ 'brute', 'Brute', 'Forca Bruta' ]
 ]
 
 __all__ = [a[0] for a in children]
