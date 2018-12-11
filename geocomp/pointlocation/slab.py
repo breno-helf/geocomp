@@ -330,12 +330,13 @@ def make_events(point_list):
                 lp.append(point_list[i][(j + 1) % len(point_list[i])].x)
                 lp.append(point_list[i][(j + 1) % len(point_list[i])].y)
                 poly = -1
-            if (evts.find(root, lp[0]) == False):
-                root = evts.insert(root, lp[0], [])
-            (evts.find(root, lp[0])).append(Event(lp, rp, True, poly))
-            if (evts.find(root, rp[0]) == False):
-                root = evts.insert(root, rp[0], [])
-            (evts.find(root, rp[0])).append(Event(lp, rp, False, poly))
+            if (lp[0] < rp[0]):
+                if (evts.find(root, lp) == False):
+                    root = evts.insert(root, lp, [])
+                (evts.find(root, lp)).append(Event(lp, rp, True, poly))
+                if (evts.find(root, rp) == False):
+                    root = evts.insert(root, rp, [])
+                (evts.find(root, rp)).append(Event(lp, rp, False, poly))
             
     
     return root
@@ -358,9 +359,9 @@ def print_event(evt):
         
 
 class Slab(object):
-    beg = 0.0
+    beg = [0.0, 0.0]
     begid = 0
-    end = 0.0
+    end = [0.0, 0.0]
     endid = 0
     lines = []
 
@@ -376,8 +377,8 @@ def print_slab(s):
 
 def make_slab(slab, abb, root):
     curr = Slab()
-    curr.beg = slab.beg
-    curr.end = slab.end
+    curr.beg = slab.beg[:]
+    curr.end = slab.end[:]
     curr.lines = slab.lines[:]
     v = abb.inOrder(root)
     for i in range (len(v)):
@@ -398,42 +399,38 @@ def make_slabs(s, events, root):
     curr = Slab()
     cel = HorLine([DMIN, DMAX, DMAX, DMAX, -1])
     abb_Root = abb.insert(abb_Root, cel, [])
-    curr.end = DMIN
+    curr.end = [DMIN, DMIN]
     v = events.inOrder(root)
     
     for i in range(len(v)):
-        curr.beg = curr.end
-        curr.end = v[i][0]
+        curr.beg = curr.end[:]
+        curr.end = v[i][0][:]
         s.append(make_slab(curr, abb, abb_Root))
-        lineID = control.plot_vert_line(curr.end)
+        lineID = control.plot_vert_line(curr.end[0])
         for j in range (len(v[i][1])):
             if not v[i][1][j].insert:
                 abb_Root = update_abb(abb, abb_Root, v[i][1][j])
         for j in range (len(v[i][1])):
             if v[i][1][j].insert:
                 abb_Root = update_abb(abb, abb_Root, v[i][1][j])
-    curr.beg = curr.end
-    curr.end = DMAX
+    curr.beg = curr.end[:]
+    curr.end = [DMAX, DMAX]
     s.append(make_slab(curr, abb, abb_Root))
     
 def bs(s, p):
     beg = 0
     end = len(s) - 1
-
-    P = Point(p[0], p[1])
-
-    P.plot()
     
     while beg < end:
         mid1 = (beg + end) // 2
         
-        begid = control.plot_vert_line(s[mid1].beg, config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
-        endid = control.plot_vert_line(s[mid1].end, config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
-        control.sleep(.25)
+        begid = control.plot_vert_line(s[mid1].beg[0], config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
+        endid = control.plot_vert_line(s[mid1].end[0], config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
+        control.sleep()
 
-        if s[mid1].beg > p[0]:
+        if (s[mid1].beg[0] > p[0]) or (s[mid1].beg[0] == p[0] and s[mid1].beg[1] > p[1]):
             end = mid1 - 1
-        elif s[mid1].end <= p[0]:
+        elif (s[mid1].end[0] < p[0]) or (s[mid1].end[0] == p[0] and s[mid1].end[1] < p[1]):
             beg = mid1 + 1
         else:
             beg = end = mid1
@@ -442,8 +439,8 @@ def bs(s, p):
         control.plot_delete(endid)
     mid1 = beg
 
-    begid = control.plot_vert_line(s[mid1].beg, config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
-    endid = control.plot_vert_line(s[mid1].end, config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
+    begid = control.plot_vert_line(s[mid1].beg[0], config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
+    endid = control.plot_vert_line(s[mid1].end[0], config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
     
     beg = 0
     end = len(s[mid1].lines) - 1
@@ -453,7 +450,7 @@ def bs(s, p):
         mid2 = (beg + end) // 2
 
         lid = control.plot_segment(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], config.COLOR_ALT2, config.LINEWIDTH_SPECIAL * 1.5)
-        control.sleep(.25)
+        control.sleep()
         
         if esquerda(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], p[0], p[1]):
             beg = mid2 + 1
@@ -465,76 +462,82 @@ def bs(s, p):
     lid = control.plot_segment(s[mid1].lines[mid2].beg[0], s[mid1].lines[mid2].beg[1], s[mid1].lines[mid2].end[0], s[mid1].lines[mid2].end[1], config.COLOR_ALT3, config.LINEWIDTH_SPECIAL * 2.0)
     
     mid2 = beg
-
-    daher = s[mid1].lines[mid2].polygon 
-
-    if daher == -1:
-        P.hilight(config.COLOR_ALT5)
-    else:
-        P.hilight(config.COLOR_LINE)
     
-    control.sleep(.5)
+    control.sleep()
     control.plot_delete(begid)
     control.plot_delete(endid)
     control.plot_delete(lid)
     return s[mid1].lines[mid2].polygon
 
+def check_vertices(p, l):
+    beg = 0
+    end = len(l) - 1
+    mid = 0
+    while beg < end:
+        mid = (beg + end) // 2
+        
+        P = Point(l[mid][0], l[mid][1])
+        P.plot()
+        P.hilight(config.COLOR_ALT2)
+        control.sleep()
+        
+        if (l[mid][0] < p[0]) or (l[mid][0] == p[0] and l[mid][1] < p[1]):
+            beg = mid + 1
+        else:
+            end = mid
+            
+        P.unhilight()
+        P.unplot()
+        
+    mid = (beg + end) // 2
+    if (l[mid][0] == p[0]) and (l[mid][1] == p[1]):
+        return l[mid][2]
+    else:
+        return -1
+            
 def SlabDecomposition (l):
     "Slab decomposition algorithm"
 
+    points = [p for p in l if type(p) is Point]
+    numP = len(points)
     
-    #N = int(l[0].x)
+    for i in range (numP):
+        points[i].unplot()
     
     polygons = [poly for poly in l if type(poly) is Polygon]
     point_list = [poly.vertices() for poly in polygons]
-    N = len(polygons)
     
-    # i = 1
-    # for j in range(N):
-    #     P = int(l[i].x)
-    #     i += 1
-    #     point_list.append([])
-    #     for k in range(P):
-    #         a = l[i + k].x
-    #         b = l[i + k].y
-    #         point_list[j].append(Point(a, b))
-    #     polygons.append(Polygon(point_list[j]))
-    #     i += P
+    v_list = []
+    for m in range (len(point_list)):
+        for n in range(len(point_list[m])):
+            v_list.append((point_list[m][n][0], point_list[m][n][1], m))
+    v_list.sort()
     
     events = AVL_Tree()
     eventsRoot = make_events(point_list)
     
-    #v = events.inOrder(eventsRoot)
-    #for i in range(len(v)):
-    #    print_event(v[i])
-    
     s = []
     make_slabs(s, events, eventsRoot)
     
-    for j in range(len(s) - 1):
-        s[j].endid = control.plot_vert_line(s[j].end)
-        if j > 0:
-            s[j].begid = s[j - 1].endid
-        else:
-            s[j].begid = s[j].endid
-    s[len(s) - 1].endid = s[len(s) - 1].begid = s[len(s) - 2].endid
-
-    points = [p for p in l if type(p) is Point]
-    numP = len(points)
-    # i += 1
-    # for j in range (numP):
-    #     a = l[i].x
-    #     b = l[i].y
-    #     points.append((a, b))
-    #     i += 1
-
     position = []
     for j in range (numP):
-        poly_id = bs(s, points[j])
+        
+        points[j].plot()
+        
+        poly_id = check_vertices(points[j], v_list)
+        if (poly_id == -1):
+            poly_id = bs(s, points[j])
+        
         position.append(poly_id)
+        
+        if poly_id == -1:
+            points[j].hilight(config.COLOR_ALT5)
+        else:
+            points[j].hilight(config.COLOR_LINE)
+        
         if (poly_id != -1):
             polygons[poly_id].plot(config.COLOR_ALT3)
-            control.sleep(.5)
+            control.sleep()
             polygons[poly_id].hide()
 
     
